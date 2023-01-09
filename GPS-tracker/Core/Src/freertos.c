@@ -71,6 +71,7 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
+	defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE END Init */
 /* USER CODE BEGIN Header */
@@ -114,7 +115,8 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
 }
