@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "gps.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -124,8 +124,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
   printf("++Start GPS Tracker++\r\n");
+
+  GPS_setDrvParam(GPS_UART_INT_ON, 0);
+
+  GPS_setDrvParam(GPS_PWR_CTRL, 1);
+
   /* USER CODE END 2 */
 
   /* Init scheduler */

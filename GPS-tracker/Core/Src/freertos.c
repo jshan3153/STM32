@@ -49,10 +49,10 @@
 //uint32_t evtFlag1 = 0x01;
 //uint32_t evtFlag2 = 0x02;
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for GPS_Task */
+osThreadId_t GPS_TaskHandle;
+const osThreadAttr_t GPS_Task_attributes = {
+  .name = "GPS_Task",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -62,7 +62,7 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void StartGPSTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -75,7 +75,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 //	evtGrpHandle = xEventGroupCreate();
 
-	defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+	GPS_TaskHandle = osThreadNew(StartGPSTask, NULL, &GPS_Task_attributes);
 
   /* USER CODE END Init */
 /* USER CODE BEGIN Header */
@@ -106,61 +106,22 @@ void MX_FREERTOS_Init(void) {
   */
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_StartGPSTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the GPS_Task thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_StartGPSTask */
+void StartGPSTask(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
-	printf("StartDefaultTask\r\n");
-	uint32_t result;
+  /* USER CODE BEGIN StartGPSTask */
   /* Infinite loop */
   for(;;)
   {
-//#if 1
-//	  result = xEventGroupWaitBits(evtGrpHandle,
-//			  	  	  	  	  	  (evtFlag1 | evtFlag2),
-//								  1,
-//								  1,
-//								  2000);
-//	  if ((result & (evtFlag1 | evtFlag2)) == (evtFlag1 | evtFlag2)){
-//		  printf("evtFlag1 | evtFlag2 set\n");
-//		  xEventGroupClearBits(evtGrpHandle, 1|2);
-//	  }
-//	  else{
-//	  	if (result & evtFlag1)
-//	  			{
-//	  				printf("evtFlag1 set\n");
-//	  				xEventGroupClearBits(evtGrpHandle, 1);
-//	  				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
-//	  				HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
-//	  			}
-//	  			else if (result & evtFlag2)
-//	  			{
-//	  				printf("evtFlag2 set\n");
-//	  				xEventGroupClearBits(evtGrpHandle, 2);
-//	  				HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
-//	  				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
-//	  			}
-//	  			else
-//	  			{
-//	  				printf("None is set\n");
-//	  			}
-//	  		}
-//    osDelay(1);
-//#else
-//	HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
-//	osDelay(1000);
-//	HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
-//	osDelay(1000);
-//
-//#endif
+    osDelay(1);
   }
-  /* USER CODE END StartDefaultTask */
+  /* USER CODE END StartGPSTask */
 }
 
 /* Private application code --------------------------------------------------*/
