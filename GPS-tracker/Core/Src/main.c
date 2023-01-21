@@ -93,6 +93,27 @@ GETCHAR_PROTOTYPE
   return ch;
 }
 
+int GNSS_PRINT(char *pBuffer)
+{
+  if (HAL_UART_Transmit(&huart2, (uint8_t*)pBuffer, (uint16_t)strlen((char *)pBuffer), 1000) != HAL_OK)
+  {
+    return 1;
+  }
+  fflush(stdout);
+
+  return 0;
+}
+
+int GNSS_PUTC(char pChar)
+{
+  if (HAL_UART_Transmit(&huart2, (uint8_t*)&pChar, 1, 1000) != HAL_OK)
+  {
+    return 1;
+  }
+  fflush(stdout);
+
+  return 0;
+}
 /* USER CODE END 0 */
 
 /**

@@ -36,6 +36,7 @@
 "./Middlewares/Third_Party/ST/src/NMEA_parser.o"
 "./Middlewares/Third_Party/ST/src/gnss1a1_gnss.o"
 "./Middlewares/Third_Party/ST/src/gnss_data.o"
+"./Middlewares/Third_Party/ST/src/gnss_lib_config.o"
 "./Middlewares/Third_Party/ST/src/gnss_parser.o"
 "./Middlewares/Third_Party/ST/src/teseo_liv3f.o"
 "./Middlewares/Third_Party/ST/src/teseo_liv3f_queue.o"

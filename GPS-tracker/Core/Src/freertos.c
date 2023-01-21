@@ -139,7 +139,7 @@ void StartGPSTask(void *argument)
 	if(gnssMsg == NULL){
 	  continue;
 	}
-#if 0
+
 	check = GNSS_PARSER_CheckSanity(gnssMsg->buf, gnssMsg->len);
 
 	//    PRINT_OUT("got ");
@@ -176,6 +176,7 @@ void StartGPSTask(void *argument)
 		if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMSAVEPAR)) {
 		  GNSS_DATA_GetGNSSAck(&GNSSParser_Data);
 		}
+
 	  }
 	}
 	//    else
@@ -184,7 +185,7 @@ void StartGPSTask(void *argument)
 	//    }
 
 	GNSS1A1_GNSS_ReleaseMessage(GNSS1A1_TESEO_LIV3F, gnssMsg);
-#endif
+
     osDelay(1);
   }
   /* USER CODE END StartGPSTask */
