@@ -47,7 +47,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 GNSSParser_Data_t GNSSParser_Data;
-osMutexId gnssDataMutexHandle;
 
 /* USER CODE END Variables */
 /* Definitions for GPS_Task */
@@ -56,6 +55,11 @@ const osThreadAttr_t GPS_Task_attributes = {
   .name = "GPS_Task",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for gnssDataMutex */
+osMutexId_t gnssDataMutexHandle;
+const osMutexAttr_t gnssDataMutex_attributes = {
+  .name = "gnssDataMutex"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -120,8 +124,7 @@ void StartGPSTask(void *argument)
 	GNSSParser_Status_t status, check;
 	const GNSS_MsgTypeDef *gnssMsg;
 
-	//osMutexDef(mutex1);
-	//gnssDataMutexHandle = osMutexCreate(osMutex(mutex1));
+	gnssDataMutexHandle = osMutexNew(&gnssDataMutex_attributes);
 
 	printf("\n\rTeseo Consumer Task running\n\r");
 	GNSS_PARSER_Init(&GNSSParser_Data);
