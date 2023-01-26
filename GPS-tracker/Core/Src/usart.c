@@ -210,81 +210,81 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		while(GPS.fsm_restart == 1)
 		{
 
-		GPS.fsm_state = GPS.fsm_next_state;
+			GPS.fsm_state = GPS.fsm_next_state;
 
-		switch (GPS.fsm_state)
-		{
+			switch (GPS.fsm_state)
+			{
 
-		case fsm_discard:
-		  GPS.fsm_restart = 0;
-		  GPS.fsm_next_state = fsm_discard;
+			case fsm_discard:
+			  GPS.fsm_restart = 0;
+			  GPS.fsm_next_state = fsm_discard;
 
-		  if (GPS.dummy_char != (uint8_t)'$')
-		  {
-			//Console_Debug((uint8_t *)".");
-			(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
-			break;
-		  }
+			  if (GPS.dummy_char != (uint8_t)'$')
+			  {
+				//Console_Debug((uint8_t *)".");
+				(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
+				break;
+			  }
 
-		  if (GPS.wr_msg == NULL)
-		  {
-			GPS.wr_msg = teseo_queue_claim_wr_buffer(GPS.pQueue);
-		  }
+			  if (GPS.wr_msg == NULL)
+			  {
+				GPS.wr_msg = teseo_queue_claim_wr_buffer(GPS.pQueue);
+			  }
 
-		  if (GPS.wr_msg == NULL)
-		  {
-			//Console_Debug((uint8_t *)".");
-			(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
-			break;
-		  }
-		  //Console_Debug((uint8_t *)"S");
+			  if (GPS.wr_msg == NULL)
+			  {
+				//Console_Debug((uint8_t *)".");
+				(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
+				break;
+			  }
+			  //Console_Debug((uint8_t *)"S");
 
-		  /* save '$' */
-		  GPS.wr_msg->buf[GPS.wr_msg->len] = GPS.dummy_char;
-		  GPS.wr_msg->len++;
-		  GPS.fsm_next_state = fsm_synch ;
-		  (void)HAL_UART_Receive_IT(&huart6,(uint8_t *)&GPS.wr_msg->buf[GPS.wr_msg->len], 1);
-		   break;
+			  /* save '$' */
+			  GPS.wr_msg->buf[GPS.wr_msg->len] = GPS.dummy_char;
+			  GPS.wr_msg->len++;
+			  GPS.fsm_next_state = fsm_synch ;
+			  (void)HAL_UART_Receive_IT(&huart6,(uint8_t *)&GPS.wr_msg->buf[GPS.wr_msg->len], 1);
+			   break;
 
-		case fsm_synch:
-		  GPS.fsm_restart = 0;
+			case fsm_synch:
+			  GPS.fsm_restart = 0;
 
-		  if (GPS.wr_msg->buf[GPS.wr_msg->len] == (uint8_t)'$')
-		  {
-			GPS.dummy_char = (uint8_t)'$';
-			GPS.wr_msg->buf[GPS.wr_msg->len] = (uint8_t)'\0';
-			teseo_queue_release_wr_buffer(GPS.pQueue, GPS.wr_msg);
-			GPS.wr_msg = NULL;
-			GPS.fsm_next_state = fsm_discard ;
-			/* check if we can resynch the new sentence */
-			GPS.fsm_restart = 1;
-			break;
-		  }
+			  if (GPS.wr_msg->buf[GPS.wr_msg->len] == (uint8_t)'$')
+			  {
+				GPS.dummy_char = (uint8_t)'$';
+				GPS.wr_msg->buf[GPS.wr_msg->len] = (uint8_t)'\0';
+				teseo_queue_release_wr_buffer(GPS.pQueue, GPS.wr_msg);
+				GPS.wr_msg = NULL;
+				GPS.fsm_next_state = fsm_discard ;
+				/* check if we can resynch the new sentence */
+				GPS.fsm_restart = 1;
+				break;
+			  }
 
-		  //Console_Debug((uint8_t *)"+");
-		  GPS.wr_msg->len++;
-		#if 0
-		  if (GPS.wr_msg->len == (uint32_t)MAX_MSG_BUF)
-		  {
-			Console_Debug("MESSAGE TOO LONG\n\r");
-			/* it seems we lost some char and the sentence is too much long...
-			* reset the msg->len and discand all teh buffer and wait a new '$' sentence
-			*/
-			GPS.fsm_next_state = fsm_discard;
-			GPS.wr_msg->len = 0;
-			GPS.fsm_restart = 1;
-			break;
-		  }
-		#endif
-		  GPS.fsm_next_state = fsm_synch;
-		  (void)HAL_UART_Receive_IT(&huart6,(uint8_t *)&GPS.wr_msg->buf[GPS.wr_msg->len],1);
-		  break;
+			  //Console_Debug((uint8_t *)"+");
+			  GPS.wr_msg->len++;
+			#if 0
+			  if (GPS.wr_msg->len == (uint32_t)MAX_MSG_BUF)
+			  {
+				Console_Debug("MESSAGE TOO LONG\n\r");
+				/* it seems we lost some char and the sentence is too much long...
+				* reset the msg->len and discand all teh buffer and wait a new '$' sentence
+				*/
+				GPS.fsm_next_state = fsm_discard;
+				GPS.wr_msg->len = 0;
+				GPS.fsm_restart = 1;
+				break;
+			  }
+			#endif
+			  GPS.fsm_next_state = fsm_synch;
+			  (void)HAL_UART_Receive_IT(&huart6,(uint8_t *)&GPS.wr_msg->buf[GPS.wr_msg->len],1);
+			  break;
 
-		case fsm_stop:
-		default:
-		  GPS.fsm_restart = 0;
-		  break;
-		}
+			case fsm_stop:
+			default:
+			  GPS.fsm_restart = 0;
+			  break;
+			}
 		}
 
 	}
