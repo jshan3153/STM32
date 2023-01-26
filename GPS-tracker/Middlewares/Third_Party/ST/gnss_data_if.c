@@ -52,7 +52,7 @@
 
 /* Global variables ----------------------------------------------------------*/
 
-extern osMutexId consoleMutexHandle;
+ osMutexId consoleMutexHandle;
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -71,30 +71,33 @@ static char *geofenceCirclePosition[] = {
 /* Puts a string to console */
 void GNSS_DATA_IF_ConsoleWrite(uint8_t *pBuffer)
 {
-//  osMutexWait(consoleMutexHandle, osWaitForever);
-//
-//  GNSS_IO_Transmit(pBuffer);
-//
-//  osMutexRelease(consoleMutexHandle);
+  //osMutexWait(consoleMutexHandle, osWaitForever);
+
+  //GNSS_IO_Transmit(pBuffer);
+  printf("%s", pBuffer);
+
+  //osMutexRelease(consoleMutexHandle);
 }
 
 /* Puts a character to console */
-void GNSS_DATA_IF_ConsoleWriteChar(uint8_t *pCh){
-//  osMutexWait(consoleMutexHandle, osWaitForever);
-//
-//  GNSS_IO_Transmit(pCh);
-//
-//  osMutexRelease(consoleMutexHandle);
+void GNSS_DATA_IF_ConsoleWriteChar(uint8_t *pCh)
+{
+  //osMutexWait(consoleMutexHandle, osWaitForever);
+
+  //GNSS_IO_Transmit(pCh);
+  printf("%c", pCh);
+
+  //osMutexRelease(consoleMutexHandle);
 }
 
 /* Reads a string from console */
 void GNSS_DATA_IF_ConsoleRead(uint8_t *pBuffer, uint16_t size, uint32_t timeout)
 {
-//  osMutexWait(consoleMutexHandle, osWaitForever);
-//
-//  GNSS_IO_Receive(pBuffer, size, timeout);
-//
-//  osMutexRelease(consoleMutexHandle);
+  osMutexWait(consoleMutexHandle, osWaitForever);
+
+  GNSS_IO_Receive(pBuffer, size, timeout);
+
+  osMutexRelease(consoleMutexHandle);
 }
 
 /* Checks the console UART read status */

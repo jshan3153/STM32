@@ -128,7 +128,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   printf("++Start GPS Tracker++\r\n");
 
-  GPS_setDrvParam(GPS_UART_INT_ON, 0);
+  GPS_setDrvParam(GPS_UART_INT_ON, 1);
 
   GPS_setDrvParam(GPS_PWR_CTRL, 1);
 

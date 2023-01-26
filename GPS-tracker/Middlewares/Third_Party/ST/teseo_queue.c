@@ -43,16 +43,17 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
 #include <string.h>
 #include "teseo_queue.h"
 
 /* Defines -------------------------------------------------------------------*/
-//#define _DEBUG
+#define _DEBUG
 #ifdef _DEBUG
 void GNSS_IO_Transmit(uint8_t *string);
-#define Console_Debug(x) GNSS_IO_Transmit((uint8_t*)x)
-#else
 #define Console_Debug(x) printf(x)
+#else
+#define Console_Debug(x)
 #endif
 
 /* Private variables ---------------------------------------------------------*/

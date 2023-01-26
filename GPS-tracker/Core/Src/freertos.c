@@ -28,7 +28,9 @@
 #include "gnss_parser.h"
 #include "teseo.h"
 #include "teseo_io.h"
+#include "teseo_queue.h"
 #include "gnss_data_if.h"
+#include "gps.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -128,11 +130,11 @@ void StartGPSTask(void *argument)
 
 	gnssDataMutexHandle = osMutexNew(&gnssDataMutex_attributes);
 
-	printf("\n\rTeseo Consumer Task running\n\r");
+	printf("Teseo Consumer Task running\r\n");
 	GNSS_PARSER_Init(&GNSSParser_Data);
 
 	for(;;){
-	    gnssMsg = Teseo_Get_Buffer(&pGNSS);
+	    gnssMsg = teseo_queue_claim_rd_buffer(GPS.pQueue);
 
 	    check = GNSS_PARSER_CheckSanity((uint8_t *)gnssMsg->buf, gnssMsg->len);
 
@@ -155,8 +157,12 @@ void StartGPSTask(void *argument)
 //	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMVER)) {
 //	          GNSS_DATA_IF_GetPSTMVerInfo(&GNSSParser_Data);
 //	        }
-//#else
-//	        status = GNSS_PARSER_ParseMsg(&GNSSParser_Data, (eNMEAMsg)m, (uint8_t *)gnssMsg->buf);
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == GPRMC)) {
+	        	GNSS_DATA_IF_GetGPRMCInfo(&GNSSParser_Data);
+	        }
+#else
+	        status = GNSS_PARSER_ParseMsg(&GNSSParser_Data, (eNMEAMsg)m, (uint8_t *)gnssMsg->buf);
+
 	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == GPGGA)) {
 	            GNSS_DATA_IF_GetValidInfo(&GNSSParser_Data);
 	        }
@@ -192,7 +198,8 @@ void StartGPSTask(void *argument)
 #endif /* USE_STM32L0XX_NUCLEO */
 	      }
 	    }
-	    Teseo_Release_Buffer(&pGNSS, gnssMsg);
+	    //Teseo_Release_Buffer(&pGNSS, gnssMsg);
+	    teseo_queue_release_rd_buffer(GPS.pQueue, gnssMsg);
 	}
   /* USER CODE END StartGPSTask */
 }

@@ -86,11 +86,11 @@ GNSS_DrvTypeDef Teseo_Drv = {
 {
   if(pGNSS->bus == GNSS_BUS_I2C)
   {
-    teseo_i2c_onoff(pGNSS, enable, nr_msg);
+    //teseo_i2c_onoff(pGNSS, enable, nr_msg);
   }
   else
   {
-    teseo_uart_rx_onoff(pGNSS, enable);
+    //teseo_uart_rx_onoff(pGNSS, enable);
   }
 
   return GNSS_OK;
@@ -103,11 +103,11 @@ GNSS_DrvTypeDef Teseo_Drv = {
 {
   if(pGNSS->bus == GNSS_BUS_I2C)
   {
-    teseo_i2c_enable(pGNSS);
+    //teseo_i2c_enable(pGNSS);
   }
   else
   {
-    teseo_uart_rx_enable(pGNSS);
+    //teseo_uart_rx_enable(pGNSS);
   }
 
   return GNSS_OK;
@@ -120,11 +120,11 @@ GNSS_DrvTypeDef Teseo_Drv = {
 {
   if(pGNSS->bus == GNSS_BUS_I2C)
   {
-    teseo_i2c_disable(pGNSS);
+    //teseo_i2c_disable(pGNSS);
   }
   else
   {
-    teseo_uart_rx_disable(pGNSS);
+    //teseo_uart_rx_disable(pGNSS);
   }
 
   return GNSS_OK;
@@ -173,7 +173,7 @@ GNSS_DrvTypeDef Teseo_Drv = {
  */
  void Teseo_Bus_RxCallback(GNSS_HandleTypeDef *pGNSS)
 {
-  Teseo_IO_DataTypeDef *teseo_io_data = (Teseo_IO_DataTypeDef *)pGNSS->pData;
+  //eseo_IO_DataTypeDef *teseo_io_data = (Teseo_IO_DataTypeDef *)pGNSS->pData;
 
   if(pGNSS->bus == GNSS_BUS_I2C)
   {
@@ -181,7 +181,7 @@ GNSS_DrvTypeDef Teseo_Drv = {
   }
   else
   {
-    teseo_uart_rx_callback_ok(teseo_io_data->huart);
+    //teseo_uart_rx_callback_ok(teseo_io_data->huart);
   }
 }
 
@@ -190,7 +190,7 @@ GNSS_DrvTypeDef Teseo_Drv = {
  */
  void Teseo_Bus_ErrorCallback(GNSS_HandleTypeDef *pGNSS)
 {
-  Teseo_IO_DataTypeDef *teseo_io_data = (Teseo_IO_DataTypeDef *)pGNSS->pData;
+  //Teseo_IO_DataTypeDef *teseo_io_data = (Teseo_IO_DataTypeDef *)pGNSS->pData;
 
   if(pGNSS->bus == GNSS_BUS_I2C)
   {
@@ -198,7 +198,7 @@ GNSS_DrvTypeDef Teseo_Drv = {
   }
   else
   {
-    teseo_uart_rx_callback_error(teseo_io_data->huart);
+    //teseo_uart_rx_callback_error(teseo_io_data->huart);
   }
 }
 
@@ -207,7 +207,7 @@ GNSS_DrvTypeDef Teseo_Drv = {
  */
  void Teseo_Bus_AbortCallback(GNSS_HandleTypeDef *pGNSS)
 {
-  Teseo_IO_DataTypeDef *teseo_io_data = (Teseo_IO_DataTypeDef *)pGNSS->pData;
+  //Teseo_IO_DataTypeDef *teseo_io_data = (Teseo_IO_DataTypeDef *)pGNSS->pData;
 
   if(pGNSS->bus == GNSS_BUS_I2C)
   {
