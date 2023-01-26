@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include "gps.h"
 #include "usart.h"
-//#include "teseo_io.h"
 
 /*
  * Instance of UART private data handler

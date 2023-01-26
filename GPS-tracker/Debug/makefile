@@ -9,7 +9,9 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include Middlewares/Third_Party/ST/src/subdir.mk
+-include Middlewares/Third_Party/ST/STM32_GNSS/LibNMEA/Src/subdir.mk
+-include Middlewares/Third_Party/ST/STM32_GNSS/LibGNSS/Src/subdir.mk
+-include Middlewares/Third_Party/ST/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/subdir.mk

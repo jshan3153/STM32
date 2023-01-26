@@ -28,5 +28,7 @@ Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \
 Middlewares/Third_Party/FreeRTOS/Source \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \
 Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang \
-Middlewares/Third_Party/ST/src \
+Middlewares/Third_Party/ST/STM32_GNSS/LibGNSS/Src \
+Middlewares/Third_Party/ST/STM32_GNSS/LibNMEA/Src \
+Middlewares/Third_Party/ST \
 

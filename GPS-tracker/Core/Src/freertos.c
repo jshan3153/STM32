@@ -25,12 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "event_groups.h"
-//#include "gnss_parser.h"
-//#include "gnss1a1_gnss.h"
-//#include "NMEA_parser.h"
-//#include "gnss_geofence.h"
-//#include "gnss_datalog.h"
+#include "gnss_parser.h"
+#include "teseo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,6 +46,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+GNSSParser_Data_t GNSSParser_Data;
+osMutexId gnssDataMutexHandle;
 
 /* USER CODE END Variables */
 /* Definitions for GPS_Task */
@@ -119,6 +117,15 @@ void MX_FREERTOS_Init(void) {
 void StartGPSTask(void *argument)
 {
   /* USER CODE BEGIN StartGPSTask */
+	GNSSParser_Status_t status, check;
+	const GNSS_MsgTypeDef *gnssMsg;
+
+	//osMutexDef(mutex1);
+	//gnssDataMutexHandle = osMutexCreate(osMutex(mutex1));
+
+	printf("\n\rTeseo Consumer Task running\n\r");
+	GNSS_PARSER_Init(&GNSSParser_Data);
+
 	for(;;){
 		osDelay(1);
 	}
