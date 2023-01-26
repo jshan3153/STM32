@@ -1,7 +1,9 @@
 /**
   *******************************************************************************
-  * @file    teseo_liv3f_queue.h
-  * @author  APG/SRA
+  * @file    teseo_queue.h
+  * @author  APG/AST/CL
+  * @version V2.0.0
+  * @date    Feb-2018
   * @brief   Teseo III buffer queue manager.
   *
   *******************************************************************************
@@ -41,16 +43,14 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef TESEO_LIV3F_QUEUE_H
-#define TESEO_LIV3F_QUEUE_H
+#ifndef TESEO_QUEUE_H
+#define TESEO_QUEUE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "teseo_liv3f_conf.h"
-
 #ifdef USE_FREE_RTOS
 #include <FreeRTOS.h>
 #include <event_groups.h>
@@ -58,19 +58,25 @@ extern "C" {
 #include <semphr.h>
 #endif /* USE_FREE_RTOS */
 
-/** @addtogroup BSP BSP
+#include "teseo.h"
+
+/** @addtogroup DRIVERS
+ * @{
+ */
+ 
+/** @addtogroup BSP
  * @{
  */
 
-/** @addtogroup COMPONENT COMPONENT
+/** @addtogroup COMPONENTS
  * @{
  */
 
-/** @addtogroup TESEO_LIV3F
+/** @addtogroup TESEOIII
  * @{
  */
 
-/** @addtogroup TESEO_LIV3F_Exported_Constants
+/** @addtogroup TESEOIII_EXPORTED_DEFINES EXPORTED DEFINES
  * @{
  */
 
@@ -89,52 +95,29 @@ extern "C" {
  * @}
  */
 
-/** @addtogroup TESEO_LIV3F_Exported_Types
+/** @addtogroup TESEOIII_EXPORTED_TYPES
  * @{
  */
-typedef int32_t (*TESEO_LIV3F_Transmit_ptr)(void *, uint8_t *, uint16_t);
-typedef int32_t (*TESEO_LIV3F_Receive_ptr)(void *, uint8_t *, uint16_t);
-typedef uint32_t (*TESEO_LIV3F_GetTick_ptr)(void *);
-typedef void (*TESEO_LIV3F_ClearOREF_ptr)(void *);
-
-typedef struct
-{
-  uint8_t *buf;
-  uint16_t len;
-} TESEO_LIV3F_Msg_t;
 
 /**
- * @brief Data structure for the Teseo Message Queue.
+ * @brief Data structure for the TeseoIII Message Queue.
  */
-typedef struct
-{
+typedef struct {
 #ifdef USE_FREE_RTOS
   SemaphoreHandle_t semaphore;
   uint32_t bitmap_unreleased_buffer_irq;
 #endif /* USE_FREE_RTOS */
   uint32_t bitmap_buffer_writable;
   uint32_t bitmap_buffer_readable;
-  TESEO_LIV3F_Msg_t nmea_queue[MAX_MSG_QUEUE];
+  GNSS_MsgTypeDef nmea_queue[MAX_MSG_QUEUE];
   uint8_t single_message_buffer[MAX_MSG_QUEUE * MAX_MSG_BUF];
-} TESEO_LIV3F_Queue_t;
-
-typedef struct
-{
-  /** Component mandatory fields **/
-  TESEO_LIV3F_Transmit_ptr  Transmit;
-  TESEO_LIV3F_Receive_ptr   Receive;
-  TESEO_LIV3F_GetTick_ptr   GetTick;
-  TESEO_LIV3F_ClearOREF_ptr ClearOREF;
-  TESEO_LIV3F_Queue_t       *pQueue;
-  /** Customizable optional pointer **/
-  void *Handle;
-} TESEO_LIV3F_ctx_t;
+} Teseo_QueueTypeDef;
 
 /**
  * @}
  */
 
-/** @addtogroup TESEO_LIV3F_Exported_Functions
+/** @addtogroup TESEOIII_EXPORTED_FUNCTIONS EXPORTED FUNCTIONS
  * @{
  */
 
@@ -143,14 +126,14 @@ typedef struct
  * @param  None
  * @retval The pointer to the created queue
  */
-TESEO_LIV3F_Queue_t *teseo_queue_init(void);
+Teseo_QueueTypeDef *teseo_queue_init(void);
 
 /**
  * @brief  Low level driver function to get a new buffer (queue message) to be written.
  * @param  pTeseoQueue The message queue
  * @retval The message retrieved
  */
-TESEO_LIV3F_Msg_t *teseo_queue_claim_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue);
+GNSS_MsgTypeDef *teseo_queue_claim_wr_buffer(Teseo_QueueTypeDef *pTeseoQueue);
 
 /**
  * @brief  Low level driver function to release a new buffer (queue message) to be written.
@@ -158,14 +141,14 @@ TESEO_LIV3F_Msg_t *teseo_queue_claim_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
  * @param  pMsg        The message to be released for a new write
  * @retval None
  */
-void teseo_queue_release_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, TESEO_LIV3F_Msg_t *pMsg);
+void teseo_queue_release_wr_buffer(Teseo_QueueTypeDef *pTeseoQueue, GNSS_MsgTypeDef *pMsg);
 
 /**
  * @brief  Low level driver function to get a new buffer (queue message) to be read.
  * @param  pTeseoQueue The message queue
  * @retval The message retrieved
  */
-const TESEO_LIV3F_Msg_t *teseo_queue_claim_rd_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue);
+const GNSS_MsgTypeDef *teseo_queue_claim_rd_buffer(Teseo_QueueTypeDef *pTeseoQueue);
 
 /**
  * @brief  Low level driver function to release a new buffer (queue message) to be read.
@@ -173,7 +156,11 @@ const TESEO_LIV3F_Msg_t *teseo_queue_claim_rd_buffer(TESEO_LIV3F_Queue_t *pTeseo
  * @param  pMsg        The message to be released for a new read
  * @retval None
  */
-void teseo_queue_release_rd_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, const TESEO_LIV3F_Msg_t *pMsg);
+void teseo_queue_release_rd_buffer(Teseo_QueueTypeDef *pTeseoQueue, const GNSS_MsgTypeDef *pMsg);
+
+/**
+ * @}
+ */
 
 /**
  * @}
@@ -195,7 +182,7 @@ void teseo_queue_release_rd_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, const TESEO
 }
 #endif
 
-#endif /* TESEO_LIV3F_QUEUE_H */
+#endif /* TESEO_QUEUE_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

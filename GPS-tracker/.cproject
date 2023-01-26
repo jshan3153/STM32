@@ -50,6 +50,7 @@
 									<listOptionValue builtIn="false" value="STM32F429xx"/>
 									<listOptionValue builtIn="false" value="ASSISTED_GNSS"/>
 									<listOptionValue builtIn="false" value="USE_FREE_RTOS"/>
+									<listOptionValue builtIn="false" value="USE_STM32F4XX_NUCLEO"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths.1841525331" name="Include paths (-I)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../Core/Inc"/>

@@ -1,8 +1,11 @@
 /**
   *******************************************************************************
-  * @file    teseo_liv3f_uart.h
-  * @author  APG/SRA
-  * @brief  Teseo III UART handler.
+  * @file    teseo.h
+  * @author  AST/CL
+  * @version V2.0.0
+  * @date    Feb-2018
+  * @brief   This file provides set of driver functions to manage communication 
+  * @brief   between MCU and Teseo
   *
   *******************************************************************************
   * @attention
@@ -41,16 +44,20 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef TESEO_LIV3F_UART_H
-#define TESEO_LIV3F_UART_H
+#ifndef TESEO_H
+#define TESEO_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "teseo_liv3f_queue.h"
+#include <stdint.h>
 
+/** @addtogroup DRIVERS
+ * @{
+ */
+ 
 /** @addtogroup BSP
  * @{
  */
@@ -59,80 +66,84 @@ extern "C" {
  * @{
  */
 
-/** @addtogroup TESEOIII
+/** @addtogroup COMMON COMMON
+ * @brief Defines the GNSS Driver object and related types.
  * @{
  */
-    
-/** @addtogroup TESEO_LIV3F_Exported_Constants
+
+/** @addtogroup COMMON_EXPORTED_DEFINES EXPORTED DEFINES
  * @{
  */
+
 /* Exported defines ----------------------------------------------------------*/
+/**
+ * @brief Constant to identify the UART channel
+ */
+#define GNSS_BUS_UART (1U)
+
+/**
+ * @brief Constant to identify the I2C channel
+ */
+#define GNSS_BUS_I2C  (2U)
 
 /**
  * @}
  */
 
-/** @addtogroup TESEO_LIV3F_Exported_Types
+/** @defgroup COMMON_EXPORTED_TYPES EXPORTED TYPES
  * @{
  */
 
 /**
- * @brief Enumeration structure that contains the status of the UART recv callback
+ * @brief Data structure for the GNSS message.
+ */
+typedef struct
+{
+  uint8_t *buf;
+  uint32_t len;
+} GNSS_MsgTypeDef;
+
+/**
+ * @brief GNSS Status enumerator definition.
  */
 typedef enum
 {
-  _ok,
-  _error
-} Teseo_UART_CB_CallerTypedef;
-/**
- * @}
- */
-
-/** @addtogroup TESEO_LIV3F_Exported_Functions
- * @{
- */
+  GNSS_OK = 0,
+  GNSS_ERROR,
+  GNSS_TIMEOUT,
+  GNSS_NOT_IMPLEMENTED
+} GNSS_StatusTypeDef;
 
 /**
- * @brief  Low level driver function to enable/disable the communication with Teseo III via UART.
- * @param  pCtx Pointer to the Teseo relevant context
- * @param  enable Flag to enable/disable the communication
- * @retval None
+ * @brief GNSS Context structure definition.
  */
-void teseo_uart_rx_onoff(TESEO_LIV3F_ctx_t *pCtx, uint8_t enable);
+typedef struct
+{
+  uint8_t bus;
+
+  void *pData;   /**< Pointer to the effective data object */	
+  void *pVTable; /**< Pointer to the Virtual Table Function. */
+} GNSS_HandleTypeDef;
 
 /**
- * @brief  Low level driver function to handle the UART recv callabck and update consistently the FSM.
- * @param  c     The type of callback
- * @retval None
+ * @brief Data structure that contains the abstract method
+ * to be implemented (and assigned) by the GNSS driver.
  */
-void teseo_uart_rx_callback(Teseo_UART_CB_CallerTypedef c);
-/**
- * @}
- */
+typedef struct
+{
+  GNSS_StatusTypeDef    (*Bus_OnOff)(GNSS_HandleTypeDef *pGNSS, uint8_t enable, int8_t nr_msg); /**< Bus UART/I2C OnOff driver abstract method */
+  GNSS_StatusTypeDef    (*Bus_Enable)(GNSS_HandleTypeDef *pGNSS); /**< Bus UART/I2C Enable driver abstract method */
+  GNSS_StatusTypeDef    (*Bus_Disable)(GNSS_HandleTypeDef *pGNSS); /**< Bus I2C Disable driver abstract method */
+  const GNSS_MsgTypeDef*(*Get_Buffer)(GNSS_HandleTypeDef *pGNSS); /**< Get Data Buffer driver abstract method */
+  GNSS_StatusTypeDef    (*Release_Buffer)(GNSS_HandleTypeDef *pGNSS, const GNSS_MsgTypeDef *pGNSS_Msg); /**< Release Data Buffer driver abstract method */
+  GNSS_StatusTypeDef    (*Bus_Write)(GNSS_HandleTypeDef *pHandle, uint8_t *pBuffer, uint16_t lenght, uint32_t timeout);
+  void                  (*Bus_RxCallback)(GNSS_HandleTypeDef *pGNSS);
+  void                  (*Bus_ErrorCallback)(GNSS_HandleTypeDef *pGNSS);
+  void                  (*Bus_AbortCallback)(GNSS_HandleTypeDef *pGNSS);
+  void                  (*Bus_BackgroundProcess)(const GNSS_HandleTypeDef *pGNSS);
 
-/** @defgroup TESEO_LIV3F_EXPORTED_MACROS EXPORTED MACROS
- * @{
- */
-/**
- * @brief Wrapper to enable the UART communication
- */
-#define teseo_uart_rx_enable(pCtx)	teseo_uart_rx_onoff(pCtx, 1)
+} GNSS_DrvTypeDef;
 
-/**
- * @brief Wrapper to disable the UART communication
- */
-#define teseo_uart_rx_disable(pCtx)	teseo_uart_rx_onoff(pCtx, 0)
-
-
-/**
- * @brief Wrapper for the UART recv complete callback
- */
-#define teseo_uart_rx_callback_ok(void) teseo_uart_rx_callback(_ok)
-
-/**
- * @brief Wrapper for the UART recv error callback
- */
-#define teseo_uart_rx_callback_error(void) teseo_uart_rx_callback(_error)
 /**
  * @}
  */
@@ -149,11 +160,13 @@ void teseo_uart_rx_callback(Teseo_UART_CB_CallerTypedef c);
  * @}
  */
 
+/**
+ * @}
+ */ 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TESEO_LIV3F_UART_H */
+#endif /* TESEO_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

@@ -29,6 +29,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
+#include "teseo_queue.h"
 
 /* USER CODE END Includes */
 

@@ -8,6 +8,12 @@
 #include <stdio.h>
 #include "gps.h"
 #include "usart.h"
+//#include "teseo_io.h"
+
+/*
+ * Instance of UART private data handler
+ */
+GPS_DrvTypeDef GPS;
 
 uint32_t GPS_setDrvParam(uint32_t param, uint32_t value)
 {
@@ -27,7 +33,24 @@ uint32_t GPS_setDrvParam(uint32_t param, uint32_t value)
 			break;
 
 		case GPS_UART_INT_ON:
-			HAL_UART_Receive_IT(&huart6, &RxData6, 1);
+			if ((GPS.fsm_state == fsm_discard) && (value == 0U)){
+			    break;
+			}
+
+			if (value == 0U){
+			    GPS.fsm_next_state = fsm_stop;
+
+			    while (GPS.fsm_state != fsm_stop) {};
+			    break;
+			}
+
+			GPS.pQueue = teseo_queue_init();
+			GPS.wr_msg = NULL;
+			GPS.fsm_state = fsm_discard;
+			GPS.fsm_next_state = fsm_discard;
+
+			(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
+
 			break;
 
 	}

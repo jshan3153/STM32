@@ -1,7 +1,9 @@
 /**
   *******************************************************************************
-  * @file    teseo_liv3f_queue.c
-  * @author  SRA
+  * @file    teseo_queue.c
+  * @author  APG/AST/CL
+  * @version V2.0.0
+  * @date    Feb-2018
   * @brief   Teseo III buffer queue manager.
   *
   *******************************************************************************
@@ -41,15 +43,20 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "teseo_liv3f_queue.h"
+#include <string.h>
+#include "teseo_queue.h"
 
 /* Defines -------------------------------------------------------------------*/
+//#define _DEBUG
+#ifdef _DEBUG
+void GNSS_IO_Transmit(uint8_t *string);
+#define Console_Debug(x) GNSS_IO_Transmit((uint8_t*)x)
+#else
+#define Console_Debug(x)
+#endif
 
 /* Private variables ---------------------------------------------------------*/
 #ifdef USE_FREE_RTOS
-  #ifndef configLIBRARY_LOWEST_INTERRUPT_PRIORITY
-    #define configLIBRARY_LOWEST_INTERRUPT_PRIORITY 15
-  #endif
 static BaseType_t b = configLIBRARY_LOWEST_INTERRUPT_PRIORITY;
 #endif /* USE_FREE_RTOS */
 
@@ -140,22 +147,22 @@ static inline void semaphore_free_irq(SemaphoreHandle_t sem)
 /*
  * Returns the static instance of a Queue object.
  */
-static TESEO_LIV3F_Queue_t *Teseo_Queue_static_alloc(void)
+static Teseo_QueueTypeDef *Teseo_Queue_static_alloc(void)
 {
-  static TESEO_LIV3F_Queue_t Teseo_Queue_Instance;
+  static Teseo_QueueTypeDef Teseo_Queue_Instance;
   return &Teseo_Queue_Instance;
 }
 
 /*
  * Returns the index of a message in the queue.
  */
-static int32_t __find_msg_idx(const TESEO_LIV3F_Queue_t *pTeseoQueue, const TESEO_LIV3F_Msg_t *pTeseoMsg)
+static int32_t __find_msg_idx(const Teseo_QueueTypeDef *pTeseoQueue, const GNSS_MsgTypeDef *pMsg)
 {
   int32_t i;
   
   for (i = 0; i < MAX_MSG_QUEUE; ++i)
   {
-    if (&pTeseoQueue->nmea_queue[i] == pTeseoMsg)
+    if (&pTeseoQueue->nmea_queue[i] == pMsg)
     {
       return i;
     }
@@ -167,7 +174,7 @@ static int32_t __find_msg_idx(const TESEO_LIV3F_Queue_t *pTeseoQueue, const TESE
 /*
  * Checks for buffers not yet released.
  */
-static void __check_unreleased_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
+static void __check_unreleased_buffer(Teseo_QueueTypeDef *pTeseoQueue)
 {
 #ifdef USE_FREE_RTOS
   if (pTeseoQueue->bitmap_unreleased_buffer_irq == 0UL)
@@ -175,7 +182,7 @@ static void __check_unreleased_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
     return;
   }
   
-  PRINT_DBG("R\n\r");
+  Console_Debug("R\n\r");
   pTeseoQueue->bitmap_buffer_readable |= pTeseoQueue->bitmap_unreleased_buffer_irq;
   pTeseoQueue->bitmap_unreleased_buffer_irq = 0;
 #endif /* USE_FREE_RTOS */
@@ -184,15 +191,15 @@ static void __check_unreleased_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
 /*
  * Checks for messages longer than MAX_MSG_BUF.
  */
-static void check_longer_msg(TESEO_LIV3F_Queue_t *pTeseoQueue, const TESEO_LIV3F_Msg_t *pTeseoMsg, uint32_t idx, int8_t wr_or_rd)
+static void check_longer_msg(Teseo_QueueTypeDef *pTeseoQueue, const GNSS_MsgTypeDef *pMsg, uint32_t idx, int8_t wr_or_rd)
 {
-  if (pTeseoMsg->len <= (uint32_t)MAX_MSG_BUF)
+  if (pMsg->len <= (uint32_t)MAX_MSG_BUF)
   {
     return;
   }
   
   uint32_t j;
-  uint32_t extra_bufs = (pTeseoMsg->len / (uint32_t)MAX_MSG_BUF) + (((pTeseoMsg->len % (uint32_t)MAX_MSG_BUF) != 0U) ? 1U : 0U);
+  uint32_t extra_bufs = (pMsg->len / (uint32_t)MAX_MSG_BUF) + (((pMsg->len % (uint32_t)MAX_MSG_BUF) != 0U) ? 1U : 0U);
   
   for (j = 0; j < extra_bufs; j++)
   {
@@ -216,20 +223,20 @@ static void check_longer_msg(TESEO_LIV3F_Queue_t *pTeseoQueue, const TESEO_LIV3F
 }
 
 /* Exported functions --------------------------------------------------------*/
-TESEO_LIV3F_Queue_t *teseo_queue_init(void)
+Teseo_QueueTypeDef *teseo_queue_init(void)
 {
-  TESEO_LIV3F_Queue_t *pTeseoQueue = Teseo_Queue_static_alloc();
+  Teseo_QueueTypeDef *pTeseoQueue = Teseo_Queue_static_alloc();
   int8_t i;
-  TESEO_LIV3F_Msg_t *pTeseoMsg;
+  GNSS_MsgTypeDef *GNSS_Msg_p;
   
-  PRINT_DBG("teseo_queue_init...\n\r" );
+  Console_Debug("teseo_queue_init...\n\r" );
   pTeseoQueue->bitmap_buffer_writable = 0;
   for (i = 0;  i < MAX_MSG_QUEUE; ++i)
   {
-    pTeseoMsg = &pTeseoQueue->nmea_queue[i];
+    GNSS_Msg_p = &pTeseoQueue->nmea_queue[i];
 
-    pTeseoMsg->buf = &pTeseoQueue->single_message_buffer[i * MAX_MSG_BUF];
-    pTeseoMsg->len = 0;
+    GNSS_Msg_p->buf = &pTeseoQueue->single_message_buffer[i * MAX_MSG_BUF];
+    GNSS_Msg_p->len = 0;
     pTeseoQueue->bitmap_buffer_writable |=  (1UL << (uint8_t)i);
   }
   pTeseoQueue->bitmap_buffer_readable = 0;
@@ -239,15 +246,15 @@ TESEO_LIV3F_Queue_t *teseo_queue_init(void)
   pTeseoQueue->semaphore = xSemaphoreCreateMutex();
 #endif /* USE_FREE_RTOS */
 
-  PRINT_DBG("teseo_queue_init: Done\n\r");
+  Console_Debug("teseo_queue_init: Done\n\r");
   
   return pTeseoQueue;
 }
 
-TESEO_LIV3F_Msg_t *teseo_queue_claim_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
+GNSS_MsgTypeDef *teseo_queue_claim_wr_buffer(Teseo_QueueTypeDef *pTeseoQueue)
 {
   int32_t i;
-  TESEO_LIV3F_Msg_t *pTeseoMsg;
+  GNSS_MsgTypeDef *pMsg;
 
 #ifdef USE_FREE_RTOS
   BaseType_t ret;
@@ -269,7 +276,7 @@ TESEO_LIV3F_Msg_t *teseo_queue_claim_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
     semaphore_free_irq(pTeseoQueue->semaphore);
 #endif /* USE_FREE_RTOS */
 
-    PRINT_DBG("-\n\r");
+    Console_Debug("-\n\r");
     return NULL;
   }
   
@@ -284,24 +291,24 @@ TESEO_LIV3F_Msg_t *teseo_queue_claim_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
   semaphore_free_irq(pTeseoQueue->semaphore);
 #endif /* USE_FREE_RTOS */
 
-  pTeseoMsg = &pTeseoQueue->nmea_queue[i];
-  pTeseoMsg->len = 0;
+  pMsg = &pTeseoQueue->nmea_queue[i];
+  pMsg->len = 0;
   
-  return pTeseoMsg;
+  return pMsg;
 }
 
-void teseo_queue_release_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, TESEO_LIV3F_Msg_t *pTeseoMsg)
+void teseo_queue_release_wr_buffer(Teseo_QueueTypeDef *pTeseoQueue, GNSS_MsgTypeDef *pMsg)
 {
   int32_t i;
 #ifdef USE_FREE_RTOS
   BaseType_t ret;
 #endif /* USE_FREE_RTOS */
   
-  if (pTeseoMsg == NULL) {
+  if (pMsg == NULL) {
     return;
   }
   
-  i = __find_msg_idx(pTeseoQueue, pTeseoMsg);
+  i = __find_msg_idx(pTeseoQueue, pMsg);
   if (i < 0) {
     /* this should NEVER happen... this means an external buffer was provided */
     return;
@@ -312,7 +319,7 @@ void teseo_queue_release_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, TESEO_LIV3F
   
   /* semaphore already taken.... */
   if (ret == pdFAIL) {
-    PRINT_DBG("+\n\r" );
+    Console_Debug("+\n\r" );
     /* mark the buffer as 'un-released'... and go-ahead... */
     pTeseoQueue->bitmap_unreleased_buffer_irq |= (1UL << (uint32_t)i);
     return;
@@ -323,7 +330,7 @@ void teseo_queue_release_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, TESEO_LIV3F
   pTeseoQueue->bitmap_buffer_readable |= (1UL << (uint32_t)i);
 
   /* check for longer message */
-  check_longer_msg(pTeseoQueue, pTeseoMsg, (uint32_t)i, 1);
+  check_longer_msg(pTeseoQueue, pMsg, (uint32_t)i, 1);
 
 #ifdef USE_FREE_RTOS
   __check_unreleased_buffer(pTeseoQueue);
@@ -331,9 +338,9 @@ void teseo_queue_release_wr_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, TESEO_LIV3F
 #endif /* USE_FREE_RTOS */
 }
 
-const TESEO_LIV3F_Msg_t *teseo_queue_claim_rd_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue)
+const GNSS_MsgTypeDef *teseo_queue_claim_rd_buffer(Teseo_QueueTypeDef *pTeseoQueue)
 {
-  const TESEO_LIV3F_Msg_t *pTeseoMsg = NULL;
+  const GNSS_MsgTypeDef *pMsg = NULL;
   int32_t i;
 
   uint8_t rd_buffer_re_try = 1;
@@ -350,7 +357,7 @@ const TESEO_LIV3F_Msg_t *teseo_queue_claim_rd_buffer(TESEO_LIV3F_Queue_t *pTeseo
 #ifdef USE_FREE_RTOS
       /* release the semaphore */
       semaphore_free(pTeseoQueue->semaphore);
-      //PRINT_DBG("No read buffer available... going to sleep...\n\r");
+      //Console_Debug("No read buffer available... going to sleep...\n\r");
       vTaskDelay(portTICK_PERIOD_MS * 5U);
       continue;
 #else
@@ -362,7 +369,7 @@ const TESEO_LIV3F_Msg_t *teseo_queue_claim_rd_buffer(TESEO_LIV3F_Queue_t *pTeseo
     i -= 1;
     /* buffer no more readable */
     pTeseoQueue->bitmap_buffer_readable &= ~(1UL << (uint32_t)i);
-    pTeseoMsg = &pTeseoQueue->nmea_queue[i];
+    pMsg = &pTeseoQueue->nmea_queue[i];
 
 #ifdef USE_FREE_RTOS
     semaphore_free(pTeseoQueue->semaphore);
@@ -370,14 +377,14 @@ const TESEO_LIV3F_Msg_t *teseo_queue_claim_rd_buffer(TESEO_LIV3F_Queue_t *pTeseo
 
     rd_buffer_re_try = 0;
   }
-  return pTeseoMsg;
+  return pMsg;
 }
 
-void teseo_queue_release_rd_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, const TESEO_LIV3F_Msg_t *pTeseoMsg)
+void teseo_queue_release_rd_buffer(Teseo_QueueTypeDef *pTeseoQueue, const GNSS_MsgTypeDef *pMsg)
 { 
   int32_t i;
   
-  i = __find_msg_idx(pTeseoQueue, pTeseoMsg);
+  i = __find_msg_idx(pTeseoQueue, pMsg);
   if (i < 0) {
     /* this should NEVER happen... this means an external buffer was provided */
     return;
@@ -390,7 +397,7 @@ void teseo_queue_release_rd_buffer(TESEO_LIV3F_Queue_t *pTeseoQueue, const TESEO
   pTeseoQueue->bitmap_buffer_writable |= (1UL << (uint32_t)i);
 
   /* check for longer message */
-  check_longer_msg(pTeseoQueue, pTeseoMsg, (uint32_t)i, 0);
+  check_longer_msg(pTeseoQueue, pMsg, (uint32_t)i, 0);
 
 #ifdef USE_FREE_RTOS
   semaphore_free(pTeseoQueue->semaphore);
