@@ -36,4 +36,6 @@
 "./Middlewares/Third_Party/ST/STM32_GNSS/LibGNSS/Src/gnss_data.o"
 "./Middlewares/Third_Party/ST/STM32_GNSS/LibGNSS/Src/gnss_parser.o"
 "./Middlewares/Third_Party/ST/STM32_GNSS/LibNMEA/Src/NMEA_parser.o"
+"./Middlewares/Third_Party/ST/gnss_data_if.o"
+"./Middlewares/Third_Party/ST/teseo_io.o"
 "./Middlewares/Third_Party/ST/teseo_queue.o"

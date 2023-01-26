@@ -27,6 +27,8 @@
 /* USER CODE BEGIN Includes */
 #include "gnss_parser.h"
 #include "teseo.h"
+#include "teseo_io.h"
+#include "gnss_data_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +49,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 GNSSParser_Data_t GNSSParser_Data;
-
+GNSS_HandleTypeDef pGNSS;
 /* USER CODE END Variables */
 /* Definitions for GPS_Task */
 osThreadId_t GPS_TaskHandle;
@@ -130,7 +132,67 @@ void StartGPSTask(void *argument)
 	GNSS_PARSER_Init(&GNSSParser_Data);
 
 	for(;;){
-		osDelay(1);
+	    gnssMsg = Teseo_Get_Buffer(&pGNSS);
+
+	    check = GNSS_PARSER_CheckSanity((uint8_t *)gnssMsg->buf, gnssMsg->len);
+
+#if 0
+	    printf("got ");
+	    (check == GNSS_PARSER_OK) ? printf("Good sentence: ") : printf("!!!Bad sentence: ");
+	    printf((uint8_t *)gnssMsg->buf);
+	    printf("\n\r");
+#endif
+
+	    if(check != GNSS_PARSER_ERROR){
+
+	      for(int m = 0; m < NMEA_MSGS_NUM; m++) {
+
+#ifndef USE_STM32L0XX_NUCLEO
+	    	osMutexAcquire(gnssDataMutexHandle, osWaitForever);
+	        status = GNSS_PARSER_ParseMsg(&GNSSParser_Data, (eNMEAMsg)m, (uint8_t *)gnssMsg->buf);
+	        osMutexRelease(gnssDataMutexHandle);
+
+//	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMVER)) {
+//	          GNSS_DATA_IF_GetPSTMVerInfo(&GNSSParser_Data);
+//	        }
+//#else
+//	        status = GNSS_PARSER_ParseMsg(&GNSSParser_Data, (eNMEAMsg)m, (uint8_t *)gnssMsg->buf);
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == GPGGA)) {
+	            GNSS_DATA_IF_GetValidInfo(&GNSSParser_Data);
+	        }
+#endif /* USE_STM32L0XX_NUCLEO */
+
+
+#if (configUSE_GEOFENCE == 1)
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMGEOFENCE)) {
+	          GNSS_DATA_IF_GetGeofenceInfo(&pGNSS, &GNSSParser_Data);
+	        }
+#endif /* configUSE_GEOFENCE */
+
+#if (configUSE_ODOMETER == 1)
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMODO)) {
+	          GNSS_DATA_IF_GetOdometerInfo(&pGNSS, &GNSSParser_Data);
+	        }
+#endif /* configUSE_ODOMETER */
+
+#if (configUSE_DATALOG == 1)
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMDATALOG)) {
+	          GNSS_DATA_IF_GetDatalogInfo(&pGNSS, &GNSSParser_Data);
+	        }
+#endif /* configUSE_DATALOG */
+
+#ifndef USE_STM32L0XX_NUCLEO
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMSGL)) {
+	          GNSS_DATA_IF_GetMsglistAck(&pGNSS, &GNSSParser_Data);
+	        }
+
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMSAVEPAR)) {
+	          GNSS_DATA_IF_GetGNSSAck(&pGNSS, &GNSSParser_Data);
+	        }
+#endif /* USE_STM32L0XX_NUCLEO */
+	      }
+	    }
+	    Teseo_Release_Buffer(&pGNSS, gnssMsg);
 	}
   /* USER CODE END StartGPSTask */
 }

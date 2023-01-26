@@ -52,7 +52,7 @@
 void GNSS_IO_Transmit(uint8_t *string);
 #define Console_Debug(x) GNSS_IO_Transmit((uint8_t*)x)
 #else
-#define Console_Debug(x)
+#define Console_Debug(x) printf(x)
 #endif
 
 /* Private variables ---------------------------------------------------------*/
