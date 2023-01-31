@@ -66,6 +66,11 @@ const osMutexAttr_t gnssDataMutex_attributes = {
   .name = "gnssDataMutex"
 };
 
+osMutexId_t consoleMutexHandle;
+const osMutexAttr_t consolMutex_attributes ={
+	.name = "contsolWriteMutex"
+};
+
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
@@ -129,6 +134,8 @@ void StartGPSTask(void *argument)
 	const GNSS_MsgTypeDef *gnssMsg;
 
 	gnssDataMutexHandle = osMutexNew(&gnssDataMutex_attributes);
+
+	consoleMutexHandle = osMutexNew(&consolMutex_attributes);
 
 	printf("Teseo Consumer Task running\r\n");
 	GNSS_PARSER_Init(&GNSSParser_Data);
@@ -200,6 +207,8 @@ void StartGPSTask(void *argument)
 	    }
 	    //Teseo_Release_Buffer(&pGNSS, gnssMsg);
 	    teseo_queue_release_rd_buffer(GPS.pQueue, gnssMsg);
+
+	    //osDelay(100);
 	}
   /* USER CODE END StartGPSTask */
 }

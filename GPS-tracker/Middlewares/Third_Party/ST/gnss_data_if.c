@@ -42,7 +42,7 @@
 #include "cmsis_os.h"
 
 #include "gnss_data_if.h"
-//#include "x_nucleo_gnss1a1.h"
+#include "usart.h"
 #include "teseo.h"
 #include "gnss_geofence.h"
 
@@ -52,13 +52,13 @@
 
 /* Global variables ----------------------------------------------------------*/
 
- osMutexId consoleMutexHandle;
+extern osMutexId consoleMutexHandle;
 
 /* Private variables ---------------------------------------------------------*/
 
 /* Variable that holds the values got by the tracking process */
 static GPGGA_Info_t stored_positions[MAX_STOR_POS];
-static char msg[MSG_SZ];
+static char msg[MSG_SZ] = {0,};
 static char gnssCmd[CMD_SZ];
 
 static char *geofenceCirclePosition[] = {
@@ -71,12 +71,13 @@ static char *geofenceCirclePosition[] = {
 /* Puts a string to console */
 void GNSS_DATA_IF_ConsoleWrite(uint8_t *pBuffer)
 {
-  //osMutexWait(consoleMutexHandle, osWaitForever);
+  osMutexAcquire(consoleMutexHandle, osWaitForever);
 
-  //GNSS_IO_Transmit(pBuffer);
-  printf("%s", pBuffer);
+	if(HAL_UART_Transmit(&huart2, pBuffer, (uint16_t)strlen((char*)pBuffer), 1000) != HAL_OK){
+		return;
+	}
 
-  //osMutexRelease(consoleMutexHandle);
+  osMutexRelease(consoleMutexHandle);
 }
 
 /* Puts a character to console */
@@ -84,8 +85,9 @@ void GNSS_DATA_IF_ConsoleWriteChar(uint8_t *pCh)
 {
   //osMutexWait(consoleMutexHandle, osWaitForever);
 
-  //GNSS_IO_Transmit(pCh);
-  printf("%c", pCh);
+	if(HAL_UART_Transmit(&huart2, pCh, 1, 1000) != HAL_OK){
+		return;
+	}
 
   //osMutexRelease(consoleMutexHandle);
 }
@@ -95,7 +97,7 @@ void GNSS_DATA_IF_ConsoleRead(uint8_t *pBuffer, uint16_t size, uint32_t timeout)
 {
   osMutexWait(consoleMutexHandle, osWaitForever);
 
-  GNSS_IO_Receive(pBuffer, size, timeout);
+  //GNSS_IO_Receive(pBuffer, size, timeout);
 
   osMutexRelease(consoleMutexHandle);
 }
@@ -103,11 +105,11 @@ void GNSS_DATA_IF_ConsoleRead(uint8_t *pBuffer, uint16_t size, uint32_t timeout)
 /* Checks the console UART read status */
 int8_t GNSS_DATA_IF_ConsoleReadable(void)
 {
-  int status;
+  int status = 0;
 
   osMutexWait(consoleMutexHandle, osWaitForever);
 
-  status = GNSS_IO_Readable();
+  //status = GNSS_IO_Readable();
 
   osMutexRelease(consoleMutexHandle);
 

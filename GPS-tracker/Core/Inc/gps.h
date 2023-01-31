@@ -37,7 +37,7 @@ typedef struct
   GNSS_MsgTypeDef *wr_msg;
   volatile int8_t fsm_restart;
 
-  GNSS_HandleTypeDef *pGNSS;
+  //GNSS_HandleTypeDef *pGNSS;
 
   Teseo_QueueTypeDef *pQueue;
 }GPS_DrvTypeDef;
