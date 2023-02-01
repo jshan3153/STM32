@@ -52,6 +52,12 @@
 /* USER CODE BEGIN Variables */
 GNSSParser_Data_t GNSSParser_Data;
 GNSS_HandleTypeDef pGNSS;
+
+osMutexId_t consoleMutexHandle;
+const osMutexAttr_t consolMutex_attributes = {
+  .name = "consoleWriteMutex"
+};
+
 /* USER CODE END Variables */
 /* Definitions for GPS_Task */
 osThreadId_t GPS_TaskHandle;
@@ -64,11 +70,6 @@ const osThreadAttr_t GPS_Task_attributes = {
 osMutexId_t gnssDataMutexHandle;
 const osMutexAttr_t gnssDataMutex_attributes = {
   .name = "gnssDataMutex"
-};
-
-osMutexId_t consoleMutexHandle;
-const osMutexAttr_t consolMutex_attributes ={
-	.name = "contsolWriteMutex"
 };
 
 /* Private function prototypes -----------------------------------------------*/
