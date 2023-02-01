@@ -122,54 +122,54 @@ void GNSS_DATA_IF_GetValidInfo(GNSSParser_Data_t *pGNSSParser_Data)
   
   if(pGNSSParser_Data->gpgga_data.valid == VALID)
   {    
-    snprintf(msg, MSG_SZ, "UTC:\t\t\t[ %02ld:%02ld:%02ld ]\n\r",
+    snprintf(msg, MSG_SZ, "UTC:\t\t\t[ %02ld:%02ld:%02ld ]\r\n",
             pGNSSParser_Data->gpgga_data.utc.hh, 
             pGNSSParser_Data->gpgga_data.utc.mm, 
             pGNSSParser_Data->gpgga_data.utc.ss);
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-    snprintf(msg, MSG_SZ, "Latitude:\t\t[ %.0f' %d'' %c ]\n\r",
+    snprintf(msg, MSG_SZ, "Latitude:\t\t[ %.0f' %d'' %c ]\r\n",
             (pGNSSParser_Data->gpgga_data.xyz.lat - ((int)pGNSSParser_Data->gpgga_data.xyz.lat % 100)) / 100, 
             ((int)pGNSSParser_Data->gpgga_data.xyz.lat % 100), 
             pGNSSParser_Data->gpgga_data.xyz.ns);          
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-    snprintf(msg, MSG_SZ, "Longitude:\t\t[ %.0f' %d'' %c ]\n\r",
+    snprintf(msg, MSG_SZ, "Longitude:\t\t[ %.0f' %d'' %c ]\r\n",
             (pGNSSParser_Data->gpgga_data.xyz.lon - ((int)pGNSSParser_Data->gpgga_data.xyz.lon % 100)) / 100, 
             ((int)pGNSSParser_Data->gpgga_data.xyz.lon % 100),
             pGNSSParser_Data->gpgga_data.xyz.ew);
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-    snprintf(msg, MSG_SZ, "Satellites locked:\t[ %ld ]\n\r",
+    snprintf(msg, MSG_SZ, "Satellites locked:\t[ %ld ]\r\n",
             pGNSSParser_Data->gpgga_data.sats);
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-    snprintf(msg, MSG_SZ, "Position accuracy:\t[ %.1f ]\n\r",
+    snprintf(msg, MSG_SZ, "Position accuracy:\t[ %.1f ]\r\n",
             pGNSSParser_Data->gpgga_data.acc);
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-    snprintf(msg, MSG_SZ, "Altitude:\t\t[ %.2f%c ]\n\r",
+    snprintf(msg, MSG_SZ, "Altitude:\t\t[ %.2f%c ]\r\n",
             pGNSSParser_Data->gpgga_data.xyz.alt, 
             (pGNSSParser_Data->gpgga_data.xyz.mis + 32));
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-    snprintf(msg, MSG_SZ, "Geoid infos:\t\t[ %ld%c ]\n\r",
+    snprintf(msg, MSG_SZ, "Geoid infos:\t\t[ %ld%c ]\r\n",
             pGNSSParser_Data->gpgga_data.geoid.height, 
             pGNSSParser_Data->gpgga_data.geoid.mis);
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-    snprintf(msg, MSG_SZ, "Diff update:\t\t[ %ld ]\n\r",
+    snprintf(msg, MSG_SZ, "Diff update:\t\t[ %ld ]\r\n",
             pGNSSParser_Data->gpgga_data.update);  
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
   }
   else
   {
-    snprintf(msg, MSG_SZ,  "Last position wasn't valid.\n\n\r");
+    snprintf(msg, MSG_SZ,  "Last position wasn't valid.\r\n");
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
   }
   
-  GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\n\n\r>");
+  GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\r\n>");
 }
 
 /* Puts to console the tracking data using the result of parsed GPGGA sentence */
@@ -412,7 +412,7 @@ void GNSS_DATA_IF_GetGPRMCInfo(GNSSParser_Data_t *pGNSSParser_Data)
 {
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\r\n");
     
-  snprintf(msg, MSG_SZ,  "UTC:\t\t\t\t[ %02ld:%02ld:%02ld ]\n\r",
+  snprintf(msg, MSG_SZ,  "UTC:\t\t\t\t[ %02ld:%02ld:%02ld ]\r\n",
           pGNSSParser_Data->gprmc_data.utc.hh, 
           pGNSSParser_Data->gprmc_data.utc.mm, 
           pGNSSParser_Data->gprmc_data.utc.ss);
@@ -423,56 +423,58 @@ void GNSS_DATA_IF_GetGPRMCInfo(GNSSParser_Data_t *pGNSSParser_Data)
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
   if (pGNSSParser_Data->gprmc_data.status == 'A')
   {
-    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"-- Valid (reported in 2D and 3D fix conditions)\n\r");
+    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"-- Valid (reported in 2D and 3D fix conditions)\r\n");
   }
   else if (pGNSSParser_Data->gprmc_data.status == 'V')
   {
-    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"-- Warning (reported in NO FIX conditions)\n\r");
+    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"-- Warning (reported in NO FIX conditions)\r\n");
+    return;
   }
   else
   {
-    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"-- Unknown status\n\r");
+    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"-- Unknown status\r\n");
+    return;
   }
     
-  snprintf(msg, MSG_SZ, "Latitude:\t\t\t[ %.0f' %02d'' %c ]\n\r",
+  snprintf(msg, MSG_SZ, "Latitude:\t\t\t[ %.0f' %02d'' %c ]\r\n",
           (pGNSSParser_Data->gprmc_data.xyz.lat - ((int)pGNSSParser_Data->gprmc_data.xyz.lat % 100)) / 100, 
           ((int)pGNSSParser_Data->gprmc_data.xyz.lat % 100), 
           pGNSSParser_Data->gprmc_data.xyz.ns);
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
   
-  snprintf(msg, MSG_SZ, "Longitude:\t\t\t[ %.0f' %02d'' %c ]\n\r",
+  snprintf(msg, MSG_SZ, "Longitude:\t\t\t[ %.0f' %02d'' %c ]\r\n",
           (pGNSSParser_Data->gprmc_data.xyz.lon - ((int)pGNSSParser_Data->gprmc_data.xyz.lon % 100)) / 100, 
           ((int)pGNSSParser_Data->gprmc_data.xyz.lon % 100),
           pGNSSParser_Data->gprmc_data.xyz.ew);
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-  snprintf(msg, MSG_SZ, "Speed over ground (knots):\t[ %.01f ]\n\r",
+  snprintf(msg, MSG_SZ, "Speed over ground (knots):\t[ %.01f ]\r\n",
           pGNSSParser_Data->gprmc_data.speed);
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
   
-  snprintf(msg, MSG_SZ, "Trackgood:\t\t\t[ %.01f ]\n\r",
+  snprintf(msg, MSG_SZ, "Trackgood:\t\t\t[ %.01f ]\r\n",
           pGNSSParser_Data->gprmc_data.trackgood);
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
   
-  snprintf(msg, MSG_SZ, "Date (ddmmyy):\t\t\t[ %ld ]\n\r",
+  snprintf(msg, MSG_SZ, "Date (ddmmyy):\t\t\t[ %ld ]\r\n",
           pGNSSParser_Data->gprmc_data.date);
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-  snprintf(msg, MSG_SZ, "Magnetic Variation:\t\t[ %.01f ]\n\r",
+  snprintf(msg, MSG_SZ, "Magnetic Variation:\t\t[ %.01f ]\r\n",
           pGNSSParser_Data->gprmc_data.mag_var);
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
   
   if ((pGNSSParser_Data->gprmc_data.mag_var_dir != 'E') &&
       (pGNSSParser_Data->gprmc_data.mag_var_dir != 'W')) {
-    snprintf(msg, MSG_SZ, "Magnetic Var. Direction:\t[ - ]\n\r");
+    snprintf(msg, MSG_SZ, "Magnetic Var. Direction:\t[ - ]\r\n");
   }
   else {
-    snprintf(msg, MSG_SZ, "Magnetic Var. Direction:\t[ %c ]\n\r",
+    snprintf(msg, MSG_SZ, "Magnetic Var. Direction:\t[ %c ]\r\n",
           pGNSSParser_Data->gprmc_data.mag_var_dir);
   }
   GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
-  GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\n\n\r>");
+  GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\n\r\n>");
 
   return;
 }
