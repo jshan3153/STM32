@@ -45,6 +45,7 @@
 #include "usart.h"
 #include "teseo.h"
 #include "gnss_geofence.h"
+#include "gps.h"
 
 /* Private defines -----------------------------------------------------------*/
 #define MSG_SZ (256)
@@ -59,7 +60,7 @@ extern osMutexId consoleMutexHandle;
 /* Variable that holds the values got by the tracking process */
 static GPGGA_Info_t stored_positions[MAX_STOR_POS];
 static char msg[MSG_SZ] = {0,};
-static char gnssCmd[CMD_SZ];
+static char gnssCmd[CMD_SZ] = {0,};
 
 static char *geofenceCirclePosition[] = {
   "Unknown",
@@ -67,6 +68,15 @@ static char *geofenceCirclePosition[] = {
   "Boundary",
   "Inside"
 };
+
+void GNSS_Bus_Reset(void *pHandle)
+{
+	GPS_setDrvParam(GPS_UART_INT_ON, 0);
+	osDelay(1000);
+	GPS_setDrvParam(GPS_UART_INT_ON, 1);
+
+	return;
+}
 
 /* Puts a string to console */
 void GNSS_DATA_IF_ConsoleWrite(uint8_t *pBuffer)
@@ -162,6 +172,7 @@ void GNSS_DATA_IF_GetValidInfo(GNSSParser_Data_t *pGNSSParser_Data)
             pGNSSParser_Data->gpgga_data.update);  
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
     
+    GNSS_Bus_Reset(NULL);
   }
   else
   {
@@ -877,7 +888,7 @@ void GNSS_DATA_IF_GetMsglistAck(void *pHandle, GNSSParser_Data_t *pGNSSParser_Da
     GNSS_DATA_IF_SendCommand(pHandle, "$PSTMSAVEPAR");
     snprintf(msg, MSG_SZ,  "Saving NMEA msg configuration...\t");
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
-    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\n\r>");
+    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\r\n>");
   }
 }
 
@@ -887,10 +898,10 @@ void GNSS_DATA_IF_GetMsglistAck(void *pHandle, GNSSParser_Data_t *pGNSSParser_Da
 void GNSS_DATA_IF_GetGNSSAck(void *pHandle, GNSSParser_Data_t *pGNSSParser_Data)
 { 
   if(pGNSSParser_Data->result == GNSS_OP_OK) {
-    //GNSS_Bus_Reset(pHandle);
+    GNSS_Bus_Reset(pHandle);
     snprintf(msg, MSG_SZ,  " Resetting...\t");
     GNSS_DATA_IF_ConsoleWrite((uint8_t *)msg);
-    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\n\r>");    
+    GNSS_DATA_IF_ConsoleWrite((uint8_t *)"\r\n>");
   }
 }
 
@@ -906,7 +917,7 @@ void GNSS_DATA_IF_SendCommand(void *pHandle, char *pCommand)
     snprintf(gnssCmd, CMD_SZ, "%s\n\r", pCommand);
 //    if (GNSS_Bus_Write(pHandle, (uint8_t *)gnssCmd, strlen(gnssCmd), MAX_DURATION) != GNSS_OK)
 //    {
-//      GNSS_DATA_IF_ConsoleWrite((uint8_t *)"Error sending command\n\n");
+      GNSS_DATA_IF_ConsoleWrite((uint8_t *)gnssCmd);
 //    }
   }
 }

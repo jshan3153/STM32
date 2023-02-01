@@ -165,8 +165,12 @@ void StartGPSTask(void *argument)
 //	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMVER)) {
 //	          GNSS_DATA_IF_GetPSTMVerInfo(&GNSSParser_Data);
 //	        }
-	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == GPRMC)) {
-	        	GNSS_DATA_IF_GetGPRMCInfo(&GNSSParser_Data);
+//	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == GPRMC)) {
+//	        	GNSS_DATA_IF_GetGPRMCInfo(&GNSSParser_Data);
+//	        }
+
+	        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == GPGGA)) {
+	            GNSS_DATA_IF_GetValidInfo(&GNSSParser_Data);
 	        }
 #else
 	        status = GNSS_PARSER_ParseMsg(&GNSSParser_Data, (eNMEAMsg)m, (uint8_t *)gnssMsg->buf);
