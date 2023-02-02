@@ -13,7 +13,8 @@
 
 typedef enum {
 	GPS_PWR_CTRL,
-	GPS_UART_INT_ON
+	GPS_UART_INT_ON,
+	GPS_UART_RESET
 }GPS_PARAM_ENUM;
 
 /*

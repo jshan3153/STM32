@@ -61,6 +61,10 @@ void Error_Handler(void);
 #define LED_RED_GPIO_Port GPIOE
 #define LED_GREEN_Pin GPIO_PIN_4
 #define LED_GREEN_GPIO_Port GPIOE
+#define DEBUG_TX_Pin GPIO_PIN_2
+#define DEBUG_TX_GPIO_Port GPIOA
+#define DEBUG_RX_Pin GPIO_PIN_3
+#define DEBUG_RX_GPIO_Port GPIOA
 #define GPS_RXD_3V3_Pin GPIO_PIN_9
 #define GPS_RXD_3V3_GPIO_Port GPIOG
 #define GPS_PWR_ON_Pin GPIO_PIN_12

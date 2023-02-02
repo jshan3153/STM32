@@ -25,10 +25,6 @@ uint32_t GPS_setDrvParam(uint32_t param, uint32_t value)
 				//#define GPS_PWR_ON_Pin GPIO_PIN_12
 				//#define GPS_PWR_ON_GPIO_Port GPIOG
 				HAL_GPIO_WritePin(GPS_PWR_ON_GPIO_Port, GPS_PWR_ON_Pin, GPIO_PIN_SET);
-
-				//HAL_Delay(500);
-
-				(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
 			}
 			else{
 				HAL_GPIO_WritePin(GPS_PWR_ON_GPIO_Port, GPS_PWR_ON_Pin, GPIO_PIN_RESET);
@@ -52,8 +48,16 @@ uint32_t GPS_setDrvParam(uint32_t param, uint32_t value)
 			GPS.fsm_state = fsm_discard;
 			GPS.fsm_next_state = fsm_discard;
 
-			//(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
+			(void)HAL_UART_Receive_IT(&huart6, &GPS.dummy_char, 1);
+			break;
 
+		case GPS_UART_RESET:
+			if(value == 0){
+				HAL_UART_DeInit(&huart6);
+			}
+			else{
+				MX_USART6_UART_Init();
+			}
 			break;
 
 	}

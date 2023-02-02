@@ -72,12 +72,11 @@ static char *geofenceCirclePosition[] = {
 void GNSS_Bus_Reset(void *pHandle)
 {
 	GPS_setDrvParam(GPS_UART_INT_ON, 0);
-	osDelay(1000);
+
 	GPS_setDrvParam(GPS_UART_INT_ON, 1);
 
 	return;
 }
-
 /* Puts a string to console */
 void GNSS_DATA_IF_ConsoleWrite(uint8_t *pBuffer)
 {
