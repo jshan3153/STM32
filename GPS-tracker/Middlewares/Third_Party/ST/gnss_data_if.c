@@ -68,6 +68,7 @@ static char *geofenceCirclePosition[] = {
   "Boundary",
   "Inside"
 };
+void GNSS_Bus_Reset(void *pHandle);
 
 void GNSS_Bus_Reset(void *pHandle)
 {

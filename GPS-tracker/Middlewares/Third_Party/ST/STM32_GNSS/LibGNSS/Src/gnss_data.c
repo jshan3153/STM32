@@ -678,7 +678,7 @@ void GNSS_DATA_GetGeofenceInfo(void *pHandle, GNSSParser_Data_t *pGNSSParser_Dat
       (void)snprintf((char *)msg, MSG_SZ,  "Geofence sub-system reply:\t[ %s ] (Saving params...)\t",
                      "GEOFENCE SUB-SYSTEM OK");
 
-      HAL_Delay(500); /* Seems to mitigate error events in case of I2C channel */
+//      HAL_Delay(500); /* Seems to mitigate error events in case of I2C channel */
       GNSS_DATA_SendCommand(pHandle, (uint8_t *)"$PSTMSAVEPAR");
     }
     else
@@ -893,7 +893,7 @@ void GNSS_DATA_GetMsglistAck(void *pHandle, const GNSSParser_Data_t *pGNSSParser
 { 
   if(pGNSSParser_Data->result == GNSS_OP_OK)
   {
-    HAL_Delay(500); /* Seems to mitigate error events in case of I2C */
+//    HAL_Delay(500); /* Seems to mitigate error events in case of I2C */
     GNSS_DATA_SendCommand(pHandle, (uint8_t *)"$PSTMSAVEPAR");
     (void)snprintf((char *)msg, MSG_SZ,  "Saving NMEA msg configuration...\t");
     GNSS_IF_ConsoleWrite(msg);
